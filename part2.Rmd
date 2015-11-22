@@ -1,0 +1,57 @@
+---
+title: "Statistical Inference Project Part 2"
+output: html_document
+---
+###Ron He
+This analysis project will use the ToothGrow data in R to tell whether supps and doeses have impacts on the lens. This project will first do some exploratory analysis to the data. Then it will perform t-tests to those intervals to show whether there are actual impacts.
+
+##Load and Explore the data
+The ToothGrowth data set is loaded and explored by graphs as following. It turns out that the data has three columns and 60 rows. We set len as the predicting variable and supp and dose as the independent variables to produce some plots.
+
+```{r, echo=TRUE, fig.width=7, fig.height=6}
+library(ggplot2)
+library(lattice)
+
+data("ToothGrowth")
+head(ToothGrowth)
+dim(ToothGrowth)
+qplot(x=dose, y=len,colour=supp,data=ToothGrowth)
+pairs(~len+supp+dose, data=ToothGrowth, main="Scatterplot of len over supp and dose")
+```
+
+The pairs plot shows that there are two different supps and three different doeses. The len vs. supp plot does not seem to have major difference. the len vs. does plot does show a significant increasement of len while increasing dose. T-tests are to performed to confirm these observations:
+
+##Confidence Intervals and Hypothesis Test
+
+Two groups of supp are directly compared to each other.
+```{r, echo=TRUE}
+t.test(len ~ supp, paired = FALSE, var.equal = TRUE, data = ToothGrowth)
+```
+
+Since there are three independent groups of doeses, t-test analysis will be performed to each of these two groups. 
+```{r, echo=TRUE}
+tg0.5_1 <-ToothGrowth[which(ToothGrowth$dose==0.5|ToothGrowth$dose==1), ]
+t.test(len ~ dose, paired = FALSE, var.equal = TRUE, data = tg0.5_1)
+
+tg1_2 <-ToothGrowth[which(ToothGrowth$dose==1|ToothGrowth$dose==2), ]
+t.test(len ~ dose, paired = FALSE, var.equal = TRUE, data = tg1_2)
+
+tg0.5_2 <-ToothGrowth[which(ToothGrowth$dose==0.5|ToothGrowth$dose==2), ]
+t.test(len ~ dose, paired = FALSE, var.equal = TRUE, data = tg0.5_2)
+```
+
+####Differeence in between suppliers:
+The 95% confidence interval of these two groups contains 0. Also, the p-value is larger than 0.05. Therefore, it is not sufficient to reject the null hyphothesis, and there is no difference between the two groups.
+
+####Differeence in between 0.5 and 1 does:
+The 95% confidence interval of these two groups does not contain 0. Also, the p-value is less than 0.05. Therefore, it is sufficient to reject the null hyphothesis, and there is significant difference between the groups of 6 to 11.
+
+####Differeence in between 1 and 1.5 does:
+The 95% confidence interval of these two groups does not contain 0. Also, the p-value is less than 0.05. Therefore, it is sufficient to reject the null hyphothesis, and there is significant difference between the groups of 4 to 8.
+
+####Differeence in between 0.5 and 1 does:
+The 95% confidence interval of these two groups does not contain 0. Also, the p-value is less than 0.05. Therefore, it is sufficient to reject the null hyphothesis, and there is significant difference between the groups of 13 to 18.
+
+
+##Conclusion
+From the t-test results, it shows that lens do not impacted by the supps. However, it shows that lens are impacted by different doeses. The conclusion is based on the Assumption that the testing groups are independent ones and are identically distributed. Aslo we assume that the groups of samples have the same variance within each group.
